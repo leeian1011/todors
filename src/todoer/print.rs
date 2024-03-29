@@ -75,7 +75,8 @@ impl Printer {
         outcome += &subject.to_string();
         print!("{}", outcome);
     }
-
+    
+    #[allow(dead_code)]
     pub fn println_colour_no_reset(subject: &str, colours: &[Colour]) {
         let codes = colours
             .iter()
@@ -89,12 +90,32 @@ impl Printer {
         outcome += &subject.to_string();
         println!("{}", outcome);
     }
+
     fn gen_line(length: usize) {
         Self::print_colour("+", &LINECOLOURS);
         for _ in 0..length {
             Self::print_colour("=", &LINECOLOURS);
         }
         Self::println_colour("+", &LINECOLOURS);
+    }
+
+    fn start_line(length: usize) {
+        Self::print_colour("+", &LINECOLOURS);
+        for _ in 0..length {
+            Self::print_colour("=", &LINECOLOURS);
+        }
+        Self::print_colour("+", &LINECOLOURS);
+    }
+
+    fn continue_line(length: usize) {
+        for _ in 0..length {
+            Self::print_colour("=", &LINECOLOURS);
+        }
+        Self::print_colour("+", &LINECOLOURS);
+    }
+
+    fn close() {
+        print!("\n");
     }
 
     fn gen_segment(subject: &str, colours: &[Colour]) {
@@ -107,7 +128,7 @@ impl Printer {
         for _ in 0..length {
             print!(" ");
         }
-        Self::println_colour("|", &LINECOLOURS);
+        Self::print_colour("|", &LINECOLOURS);
     }
 
     pub fn box_print(list: &[&str], colours: &[Colour]) {
@@ -119,11 +140,92 @@ impl Printer {
         }
         Self::gen_line(longest);
         for item in list {
-            Printer::gen_segment(item, colours);
-            Printer::add_padding(longest, item.len());
+            Self::gen_segment(item, colours);
+            Self::add_padding(longest, item.len());
+            Self::close();
         }
         Self::gen_line(longest);
     }
+
+    pub fn table_print(keys: &[Vec<&str>], colours: &[Colour]) -> Result<(), PrinterError> {
+        if keys.len() < 2 {
+            return Err(PrinterError { error: String::from("Can't produce table of one key")});
+        }
+
+        let mut max_key_length: Vec<usize> = vec![];
+        for key in keys {
+            let mut key_longest = 0;
+            for subject in key {
+                if subject.len() > key_longest {
+                    key_longest = subject.len();
+                }
+            }
+            max_key_length.push(key_longest);
+        }
+
+        for i in 0..max_key_length.len() {
+            if max_key_length.len() == 1 {
+                Self::gen_line(max_key_length[i]);
+                break;
+            }
+            if i == 0 {
+                Self::start_line(max_key_length[i]);
+                continue;
+            }
+
+            Self::continue_line(max_key_length[i]);
+        }
+        Self::close();
+
+
+        for i in 0..keys[0].len() {
+            for j in 0..keys.len() {
+                if j == 0 {
+                    Self::gen_segment(keys[j][i], colours);
+                    Self::add_padding(max_key_length[j], keys[j][i].len());
+                    continue;
+                }
+                Self::print_colour(keys[j][i], colours);
+                Self::add_padding(max_key_length[j], keys[j][i].len());
+            }
+            Self::close();
+            for i in 0..max_key_length.len() {
+                if max_key_length.len() == 1 {
+                    Self::gen_line(max_key_length[i]);
+                    break;
+                }
+                if i == 0 {
+                    Self::start_line(max_key_length[i]);
+                    continue;
+                }
+
+                Self::continue_line(max_key_length[i]);
+            }
+            Self::close();
+        }
+        Ok(())
+    }
 }
 
+#[derive(Debug)]
+pub struct PrinterError {
+    error: String
+}
 
+impl std::fmt::Display for PrinterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "pritner err")
+    }
+}
+
+impl std::error::Error for PrinterError {
+    fn cause(&self) -> Option<&dyn std::error::Error> {
+        None
+    }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
+    fn description(&self) -> &str {
+        "print error"
+    }
+}
