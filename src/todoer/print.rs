@@ -32,17 +32,74 @@ fn get_colour_code(colour: &Colour) -> &'static str {
 pub struct Printer;
 
 impl Printer {
-    fn gen_line(length: usize) {
-        print_colour("+", &LINECOLOURS);
-        for _ in 0..length {
-            print_colour("=", &LINECOLOURS);
+    pub fn println_colour(subject: &str, colours: &[Colour]) {
+        let codes = colours
+            .iter()
+            .map(|colour| get_colour_code(colour))
+            .collect::<Vec<_>>();
+        let mut outcome = String::new();
+        for code in codes {
+            outcome.push_str(code);
         }
-        println_colour("+", &LINECOLOURS);
+
+        outcome += &subject.to_string();
+        outcome.push_str(RESET);
+        println!("{}", outcome);
+    }
+
+    pub fn print_colour(subject: &str, colours: &[Colour]) {
+        let codes = colours
+            .iter()
+            .map(|colour| get_colour_code(colour))
+            .collect::<Vec<_>>();
+        let mut outcome = String::new();
+        for code in codes {
+            outcome.push_str(code);
+        }
+
+        outcome += &subject.to_string();
+        outcome.push_str(RESET);
+        print!("{}", outcome);
+    }
+
+    pub fn print_colour_no_reset(subject: &str, colours: &[Colour]) {
+        let codes = colours
+            .iter()
+            .map(|colour| get_colour_code(colour))
+            .collect::<Vec<_>>();
+        let mut outcome = String::new();
+        for code in codes {
+            outcome.push_str(code);
+        }
+
+        outcome += &subject.to_string();
+        print!("{}", outcome);
+    }
+
+    pub fn println_colour_no_reset(subject: &str, colours: &[Colour]) {
+        let codes = colours
+            .iter()
+            .map(|colour| get_colour_code(colour))
+            .collect::<Vec<_>>();
+        let mut outcome = String::new();
+        for code in codes {
+            outcome.push_str(code);
+        }
+
+        outcome += &subject.to_string();
+        println!("{}", outcome);
+    }
+    fn gen_line(length: usize) {
+        Self::print_colour("+", &LINECOLOURS);
+        for _ in 0..length {
+            Self::print_colour("=", &LINECOLOURS);
+        }
+        Self::println_colour("+", &LINECOLOURS);
     }
 
     fn gen_segment(subject: &str, colours: &[Colour]) {
-        print_colour("|", &LINECOLOURS);
-        print_colour(subject, colours);
+        Self::print_colour("|", &LINECOLOURS);
+        Self::print_colour(subject, colours);
     }
 
     fn add_padding(max_length: usize, text_length: usize) {
@@ -50,7 +107,7 @@ impl Printer {
         for _ in 0..length {
             print!(" ");
         }
-        println_colour("|", &LINECOLOURS);
+        Self::println_colour("|", &LINECOLOURS);
     }
 
     pub fn box_print(list: &[&str], colours: &[Colour]) {
@@ -60,70 +117,13 @@ impl Printer {
                 longest = item.len();
             }
         }
-        Printer::gen_line(longest);
+        Self::gen_line(longest);
         for item in list {
             Printer::gen_segment(item, colours);
             Printer::add_padding(longest, item.len());
         }
-        Printer::gen_line(longest);
+        Self::gen_line(longest);
     }
 }
 
 
-pub fn println_colour(subject: &str, colours: &[Colour]) {
-    let codes = colours
-        .iter()
-        .map(|colour| get_colour_code(colour))
-        .collect::<Vec<_>>();
-    let mut outcome = String::new();
-    for code in codes {
-        outcome.push_str(code);
-    }
-
-    outcome += &subject.to_string();
-    outcome.push_str(RESET);
-    println!("{}", outcome);
-}
-
-pub fn print_colour(subject: &str, colours: &[Colour]) {
-    let codes = colours
-        .iter()
-        .map(|colour| get_colour_code(colour))
-        .collect::<Vec<_>>();
-    let mut outcome = String::new();
-    for code in codes {
-        outcome.push_str(code);
-    }
-
-    outcome += &subject.to_string();
-    outcome.push_str(RESET);
-    print!("{}", outcome);
-}
-
-pub fn print_colour_no_reset(subject: &str, colours: &[Colour]) {
-    let codes = colours
-        .iter()
-        .map(|colour| get_colour_code(colour))
-        .collect::<Vec<_>>();
-    let mut outcome = String::new();
-    for code in codes {
-        outcome.push_str(code);
-    }
-
-    outcome += &subject.to_string();
-    print!("{}", outcome);
-}
-
-pub fn println_colour_no_reset(subject: &str, colours: &[Colour]) {
-    let codes = colours
-        .iter()
-        .map(|colour| get_colour_code(colour))
-        .collect::<Vec<_>>();
-    let mut outcome = String::new();
-    for code in codes {
-        outcome.push_str(code);
-    }
-
-    outcome += &subject.to_string();
-    println!("{}", outcome);
-}
