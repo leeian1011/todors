@@ -2,6 +2,7 @@ pub const RED_TEXT: &'static str = "\u{001b}[31m";
 pub const GREEN_TEXT: &'static str = "\u{001b}[32m";
 pub const BLUE_TEXT: &'static str = "\u{001b}[34m";
 pub const MAGENTA_TEXT: &'static str = "\u{001b}[35m";
+pub const CYAN_TEXT: &'static str = "\u{001b}[36m";
 pub const RESET: &'static str = "\u{001b}[0m";
 // pub const RED_BG: &'static str = "\u{001b}[41m";
 // pub const GREEN_BG: &'static str = "\u{001b}[42m";
@@ -13,7 +14,8 @@ pub enum Colour {
     RedText,
     GreenText,
     BlueText,
-    MagentaText
+    MagentaText,
+    CyanText,
 }
 
 fn get_colour_code(colour: &Colour) -> &'static str {
@@ -22,6 +24,7 @@ fn get_colour_code(colour: &Colour) -> &'static str {
         Colour::GreenText => GREEN_TEXT,
         Colour::BlueText => BLUE_TEXT,
         Colour::MagentaText => MAGENTA_TEXT,
+        Colour::CyanText => CYAN_TEXT,
     }
 }
 
