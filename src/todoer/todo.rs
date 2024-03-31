@@ -12,13 +12,10 @@ struct Task {
 }
 
 impl Task {
-    fn new(name: String, desc: Option<String>, prio: Option<Colour>) -> Self {
+    fn new(name: String, prio: Option<Colour>) -> Self {
         Self {
             name,
-            description: match desc {
-                Some(desc) => desc,
-                None => "".to_string(),
-            },
+            description: "".to_string(),
             priority: match prio {
                 Some(prio) => prio,
                 None => Colour::CyanText,
@@ -54,12 +51,12 @@ impl Todo {
         })
     }
 
-    pub fn add(&mut self, name: String, desc: Option<String>, prio: Option<Colour>) -> Result<(), TodoError> {
+    pub fn add(&mut self, name: String, prio: Option<Colour>) -> Result<(), TodoError> {
         match self.tasks.iter().find(|task| task.name == name) {
             Some(_) => return Err(TodoError(format!("Task with name {} already exists!", name))),
             None => {}
         }
-        self.tasks.push(Task::new(name, desc, prio));
+        self.tasks.push(Task::new(name, prio));
         Ok(())
     }
 

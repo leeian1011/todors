@@ -1,5 +1,5 @@
 mod todoer;
-use std::io::{BufRead, Write};
+use std::{io::{BufRead, Write}, os::fd::AsFd};
 use todoer::print::{Colour, Printer};
 
 use crate::todoer::todo;
@@ -87,7 +87,6 @@ fn main() {
                 }
 
                 let mut name = None;
-                let mut desc = None;
                 let mut prio = None;
 
                 for item in split_buffer {
@@ -102,9 +101,6 @@ fn main() {
                     match key_value[0] {
                         "name" | "n" => {
                             name = Some(key_value[1].trim().to_string());
-                        }
-                        "description" | "d" => {
-                            desc = Some(key_value[1].trim().to_string());
                         }
                         "priority" | "p" => {
                             prio = match key_value[1].trim().to_lowercase().as_str() {
@@ -141,13 +137,21 @@ fn main() {
                     Some(name) => name 
                 };
 
-                match todo.add(name.clone(), desc, prio) {
+                match todo.add(name.clone(), prio) {
                     Err(e) => Printer::box_print(&[e.0.as_str()], &Colour::RedText),
                     Ok(_) => Printer::box_print(
                         &[format!("Successfully added {}!", name).as_str()],
                         &TODORS_COLOURS,
                     ),
                 };
+            },
+            "remove" => {
+                let name = split_buffer[1].trim().to_string();
+                Printer::box_print(
+                    &[format!("Successfully removed '{}'", name).as_str()],
+                    &TODORS_COLOURS
+                );
+                todo.remove(name);
             }
             "help" => {
                 if split_buffer.len() == 1 {
