@@ -95,6 +95,7 @@ fn main() {
 
                 let mut name = None;
                 let mut prio = None;
+                let mut tag = None;
 
                 for item in split_buffer {
                     let key_value = item.split("=").collect::<Vec<_>>();
@@ -120,6 +121,9 @@ fn main() {
                                 }
                             };
                         }
+                        "tag" | "t" => {
+                            tag = Some(key_value[1].trim().to_string());
+                        }
                         _ => {
                             Printer::box_print(
                                 &[format!("Invalid key input '{}'", key_value[0]).as_str()],
@@ -144,7 +148,7 @@ fn main() {
                     Some(name) => name 
                 };
 
-                match todo.lock().unwrap().add(name.clone(), prio) {
+                match todo.lock().unwrap().add(name.clone(), prio, tag) {
                     Err(e) => Printer::box_print(&[e.0.as_str()], &Colour::RedText),
                     Ok(_) => Printer::box_print(
                         &[format!("Successfully added {}!", name).as_str()],

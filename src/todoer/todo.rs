@@ -5,6 +5,7 @@ use super::print::{Colour, Printer};
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 struct Task {
     name: String,
+    tag: String,
     description: String,
     priority: Colour,
     completed: bool,
@@ -12,9 +13,13 @@ struct Task {
 }
 
 impl Task {
-    fn new(name: String, prio: Option<Colour>) -> Self {
+    fn new(name: String, prio: Option<Colour>, tag: Option<String>) -> Self {
         Self {
             name,
+            tag: match tag {
+                Some(tag) => tag,
+                None => "".to_string(),
+            },
             description: "".to_string(),
             priority: match prio {
                 Some(prio) => prio,
@@ -60,12 +65,12 @@ impl Todo {
         Ok(())
     }
 
-    pub fn add(&mut self, name: String, prio: Option<Colour>) -> Result<(), TodoError> {
+    pub fn add(&mut self, name: String, prio: Option<Colour>, tag: Option<String>) -> Result<(), TodoError> {
         match self.tasks.iter().find(|task| task.name == name) {
             Some(_) => return Err(TodoError(format!("Task with name {} already exists!", name))),
             None => {}
         }
-        self.tasks.push(Task::new(name, prio));
+        self.tasks.push(Task::new(name, prio, tag));
         Ok(())
     }
 
@@ -74,14 +79,15 @@ impl Todo {
     }
 
     pub fn list(&self) {
-        let mut printable_array: [Vec<&str>;2] = [vec!["Name"], vec!["Description"]];
+        let mut printable_array: [Vec<&str>;3] = [vec!["Name"], vec!["Tag"], vec!["Description"]];
         
         let mut colour_array: Vec<Colour> = vec![Colour::MagentaText];
         let tasks = &self.tasks;
 
         for task in tasks {
             printable_array[0].push(&task.name);
-            printable_array[1].push(&task.description);
+            printable_array[1].push(&task.tag);
+            printable_array[2].push(&task.description);
             if task.completed {
                 colour_array.push(Colour::GreenText);
             } else {
