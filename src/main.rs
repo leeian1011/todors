@@ -1,10 +1,8 @@
 mod todoer;
 use std::io::{BufRead, Write};
-
-use chrono::Local;
 use todoer::print::{Colour, Printer};
 
-const TODORSCOLOURS: [Colour; 1] = [Colour::GreenText];
+const TODORSCOLOURS: Colour = Colour::GreenText;
 const HELPLIST: [&'static str; 5] = [
     "list",
     "add [task]",
@@ -43,7 +41,7 @@ fn main() {
     };
 
     Printer::box_print(&["todors"], &TODORSCOLOURS);
-    Printer::print_colour_no_reset("|> ", &[Colour::BlueText]);
+    print!("|> ");
     let _ = std::io::stdout().flush();
 
     let mut stdin_buffer = String::new();
@@ -63,16 +61,16 @@ fn main() {
                 } else if split_buffer.len() == 2 {
                     match split_buffer[1].trim() {
                         "list" => {
-                            _ = Printer::table_print(&listhelp, &[Colour::RedText]);
+                            _ = Printer::table_print(&listhelp, Colour::RedText);
                         }
                         "add" => {
-                            _ = Printer::table_print(&addhelp, &[Colour::RedText]);
+                            _ = Printer::table_print(&addhelp, Colour::RedText);
                         }
                         "remove" => {
-                            _ = Printer::table_print(&removehelp, &[Colour::RedText]);
+                            _ = Printer::table_print(&removehelp, Colour::RedText);
                         }
                         "complete" => {
-                            _ = Printer::table_print(&completehelp, &[Colour::RedText]);
+                            _ = Printer::table_print(&completehelp, Colour::RedText);
                         }
                         _ => {
                             Printer::println_colour(
@@ -102,11 +100,11 @@ fn main() {
             _ => Printer::println_colour("todors: I didn't quite get that", &TODORSCOLOURS),
         }
         stdin_buffer.clear();
-        Printer::print_colour_no_reset("|> ", &[Colour::BlueText]);
+        print!("|> ");
         let _ = std::io::stdout().flush();
     }
 
-    let date = Local::now().to_rfc3339();
-
-    Printer::println_colour(&date, &[Colour::BlueText]);
+    // let date = Local::now().to_rfc3339();
+    //
+    // Printer::println_colour(&date, &[Colour::BlueText]);
 }

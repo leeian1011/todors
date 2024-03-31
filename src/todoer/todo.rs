@@ -1,12 +1,12 @@
 #[derive(serde::Deserialize)]
 struct Task {
     name: String,
-    created_at: u64 
+    created_at: u64,
 }
 
 #[derive(serde::Deserialize)]
 struct Todo {
-    tasks: Vec<Task>
+    tasks: Vec<Task>,
 }
 
 impl Todo {
@@ -15,7 +15,7 @@ impl Todo {
         match std::env::vars().find(|(var, _)| var == "TODORS_CACHE") {
             None => {
                 path.push_str(".");
-            },
+            }
             Some((_, _path)) => {
                 path = _path;
             }
@@ -24,9 +24,6 @@ impl Todo {
         let tasks = std::fs::read(path + "/todorstasks.json")?;
         let tasks = String::from_utf8_lossy(&tasks);
         let tasks = serde_json::from_str::<Vec<Task>>(&tasks)?;
-        Ok(Self {
-            tasks
-        })
+        Ok(Self { tasks })
     }
 }
-
