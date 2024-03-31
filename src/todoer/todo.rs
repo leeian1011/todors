@@ -2,7 +2,7 @@ use chrono::Local;
 
 use super::print::{Colour, Printer};
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 struct Task {
     name: String,
     description: String,
@@ -26,7 +26,7 @@ impl Task {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 pub struct Todo {
     tasks: Vec<Task>,
 }
@@ -80,8 +80,23 @@ impl Todo {
             }
         }
 
-
         _ = Printer::table_print(&printable_array, &colour_array);
+    }
+
+    pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let serialized_json = serde_json::to_string(&self.tasks)?;
+        let mut path = String::new();
+        match std::env::vars().find(|(var, _)| var == "TODORS_CACHE") {
+            None => {
+                path.push('.');
+            }
+            Some((_, _path)) => {
+                path = _path;
+            }
+        };
+
+        std::fs::write(path + "/todorstasks.json", serialized_json.as_bytes())?;
+        Ok(())
     }
 }
 

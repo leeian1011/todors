@@ -188,7 +188,8 @@ fn main() {
             }
             "exit" => {
                 Printer::box_print(&["Goodbye!"], &TODORS_COLOURS);
-                panic!();
+                _ = todo.save();
+                break;
             }
             _ => Printer::box_print(&["Unrecognized command"], &TODORS_COLOURS),
         }
