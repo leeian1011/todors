@@ -1,6 +1,7 @@
 pub const RED_TEXT: &'static str = "\u{001b}[31m";
 pub const GREEN_TEXT: &'static str = "\u{001b}[32m";
 pub const BLUE_TEXT: &'static str = "\u{001b}[34m";
+pub const MAGENTA_TEXT: &'static str = "\u{001b}[35m";
 pub const RESET: &'static str = "\u{001b}[0m";
 // pub const RED_BG: &'static str = "\u{001b}[41m";
 // pub const GREEN_BG: &'static str = "\u{001b}[42m";
@@ -12,6 +13,7 @@ pub enum Colour {
     RedText,
     GreenText,
     BlueText,
+    MagentaText
 }
 
 fn get_colour_code(colour: &Colour) -> &'static str {
@@ -19,6 +21,7 @@ fn get_colour_code(colour: &Colour) -> &'static str {
         Colour::RedText => RED_TEXT,
         Colour::GreenText => GREEN_TEXT,
         Colour::BlueText => BLUE_TEXT,
+        Colour::MagentaText => MAGENTA_TEXT,
     }
 }
 
@@ -99,7 +102,7 @@ impl Printer {
         Self::gen_line(longest);
     }
 
-    pub fn table_print(keys: &[Vec<&str>], colour: Colour) -> Result<(), PrinterError> {
+    pub fn table_print(keys: &[Vec<&str>], colours: &[Colour]) -> Result<(), PrinterError> {
         if keys.len() < 2 {
             return Err(PrinterError {
                 error: String::from("Can't produce table of one key"),
@@ -134,11 +137,11 @@ impl Printer {
         for i in 0..keys[0].len() {
             for j in 0..keys.len() {
                 if j == 0 {
-                    Self::gen_segment(keys[j][i], &colour);
+                    Self::gen_segment(keys[j][i], &colours[i]);
                     Self::add_padding(max_key_length[j], keys[j][i].len());
                     continue;
                 }
-                Self::print_colour(keys[j][i], &colour);
+                Self::print_colour(keys[j][i], &colours[i]);
                 Self::add_padding(max_key_length[j], keys[j][i].len());
             }
             Self::close();
