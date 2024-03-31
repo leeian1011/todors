@@ -50,7 +50,21 @@ fn main() {
     while stdin_handle.read_line(&mut stdin_buffer).unwrap() > 0 {
         let split_buffer = stdin_buffer.split(' ').collect::<Vec<_>>();
         match split_buffer.first().unwrap().trim() {
-            "list" => {}
+            "debug" => {
+                _ = Printer::table_print(
+                    &[
+                        vec!["name", "lee", "lan", "jiao"],
+                        vec!["age", "22", "23", "24"],
+                        vec!["power", "1000", "8000", "9000+"],
+                    ],
+                    &[
+                        Colour::MagentaText,
+                        Colour::RedText,
+                        Colour::GreenText,
+                        Colour::BlueText,
+                    ],
+                );
+            }
             "help" => {
                 if split_buffer.len() == 1 {
                     Printer::println_colour(
@@ -61,16 +75,28 @@ fn main() {
                 } else if split_buffer.len() == 2 {
                     match split_buffer[1].trim() {
                         "list" => {
-                            _ = Printer::table_print(&listhelp, Colour::RedText);
+                            _ = Printer::table_print(
+                                &listhelp,
+                                &[Colour::RedText, Colour::GreenText],
+                            );
                         }
                         "add" => {
-                            _ = Printer::table_print(&addhelp, Colour::RedText);
+                            _ = Printer::table_print(
+                                &addhelp,
+                                &[Colour::RedText, Colour::GreenText],
+                            );
                         }
                         "remove" => {
-                            _ = Printer::table_print(&removehelp, Colour::RedText);
+                            _ = Printer::table_print(
+                                &removehelp,
+                                &[Colour::RedText, Colour::GreenText],
+                            );
                         }
                         "complete" => {
-                            _ = Printer::table_print(&completehelp, Colour::RedText);
+                            _ = Printer::table_print(
+                                &completehelp,
+                                &[Colour::RedText, Colour::GreenText],
+                            );
                         }
                         _ => {
                             Printer::println_colour(
