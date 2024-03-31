@@ -15,28 +15,28 @@ fn main() {
     let listhelp: [Vec<&'static str>; 2] = {
         [
             vec!["COMMAND", "list"],
-            vec!["DESCRIPTION", "Retrieve all tasks"],
+            vec!["DESCRIPTION", "Retrieve all tasks."],
         ]
     };
 
     let addhelp: [Vec<&'static str>; 2] = {
         [
             vec!["COMMAND", "add [task]"],
-            vec!["DESCRIPTION", "Add a new task"],
+            vec!["DESCRIPTION", "Add a new task."],
         ]
     };
 
     let removehelp: [Vec<&'static str>; 2] = {
         [
             vec!["COMMAND", "remove [task]"],
-            vec!["DESCRIPTION", "Remove a task"],
+            vec!["DESCRIPTION", "Remove a task."],
         ]
     };
 
     let completehelp: [Vec<&'static str>; 2] = {
         [
             vec!["COMMAND", "complete [task]"],
-            vec!["DESCRIPTION", "Mark a task as completed"],
+            vec!["DESCRIPTION", "Mark a task as completed."],
         ]
     };
 
@@ -53,18 +53,22 @@ fn main() {
             "debug" => {
                 _ = Printer::table_print(
                     &[
-                        vec!["name", "lee", "lan", "jiao"],
-                        vec!["age", "22", "23", "24"],
-                        vec!["power", "1000", "8000", "9000+"],
+                        vec!["Name", "Cybotrade-v1.4.0", "Datasource-v1.7.8"],
+                        vec![
+                        "Description",
+                        "Check if change of function signature will affect anything",
+                        "Check for any changes required for cybotrade to introduce new datasource"],
+                        vec!["Created", "3d ago", "17m ago"],
                     ],
                     &[
                         Colour::MagentaText,
                         Colour::RedText,
                         Colour::GreenText,
-                        Colour::BlueText,
+                        Colour::CyanText,
                     ],
                 );
             }
+            "list" => {}
             "help" => {
                 if split_buffer.len() == 1 {
                     Printer::println_colour(
