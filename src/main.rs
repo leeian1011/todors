@@ -1,8 +1,7 @@
 mod todoer;
-use std::{io::{BufRead, Write}, os::fd::AsFd};
-use todoer::print::{Colour, Printer};
-
-use crate::todoer::todo;
+use std::{io::{BufRead, Write}, process::exit, sync::{Arc, Mutex}};
+use todoer::{print::{Colour, Printer}, todo::Todo};
+use ctrlc::set_handler;
 
 const TODORS_COLOURS: Colour = Colour::GreenText;
 const TODORS_TABLE_COLOURS: [Colour; 2] = [Colour::RedText, Colour::GreenText];
@@ -15,7 +14,15 @@ const HELP_LIST: [&'static str; 5] = [
 ];
 
 fn main() {
-    let mut todo = todo::Todo::new().unwrap();
+    let todo = Arc::new(Mutex::new(Todo::new().unwrap()));
+    let handler_todo: Arc<Mutex<Todo>> = Arc::clone(&todo);
+    set_handler(move || {
+        let todo_lock = handler_todo.lock().unwrap();
+        todo_lock.save().unwrap();
+        println!();
+        exit(-1);
+    }).unwrap();
+
     let listhelp: [Vec<&'static str>; 2] = {
         [
             vec!["COMMAND", "list"],
@@ -74,7 +81,7 @@ fn main() {
                 );
             }
             "list" => {
-                todo.list();
+                todo.lock().unwrap().list();
             }
             "add" => {
                 split_buffer.swap_remove(0);
@@ -137,7 +144,7 @@ fn main() {
                     Some(name) => name 
                 };
 
-                match todo.add(name.clone(), prio) {
+                match todo.lock().unwrap().add(name.clone(), prio) {
                     Err(e) => Printer::box_print(&[e.0.as_str()], &Colour::RedText),
                     Ok(_) => Printer::box_print(
                         &[format!("Successfully added {}!", name).as_str()],
@@ -151,7 +158,24 @@ fn main() {
                     &[format!("Successfully removed '{}'", name).as_str()],
                     &TODORS_COLOURS
                 );
-                todo.remove(name);
+                todo.lock().unwrap().remove(name);
+            }
+            "describe" => {
+                if split_buffer.len() <=2 {
+                    Printer::box_print(&["`describe` command was used incorrectly."], &Colour::RedText);
+                    Printer::cursor();
+                    _ = std::io::stdout().flush();
+                    stdin_buffer.clear();
+                    continue 'main;
+                }
+
+                let name = split_buffer[1].trim();
+                let desc = split_buffer[2..split_buffer.len()].join(" ").trim().to_string();
+                _ = todo.lock().unwrap().describe(name, desc);
+
+            },
+            "tag" => {
+
             }
             "help" => {
                 if split_buffer.len() == 1 {
@@ -188,11 +212,13 @@ fn main() {
             }
             "exit" => {
                 Printer::box_print(&["Goodbye!"], &TODORS_COLOURS);
-                _ = todo.save();
+                _ = todo.lock().unwrap().save();
                 break;
             }
             _ => Printer::box_print(&["Unrecognized command"], &TODORS_COLOURS),
         }
+
+        
         stdin_buffer.clear();
         Printer::cursor();
         let _ = std::io::stdout().flush();

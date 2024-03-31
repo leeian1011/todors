@@ -2,7 +2,7 @@ use chrono::Local;
 
 use super::print::{Colour, Printer};
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize, Clone)]
 struct Task {
     name: String,
     description: String,
@@ -26,7 +26,7 @@ impl Task {
     }
 }
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct Todo {
     tasks: Vec<Task>,
 }
@@ -49,6 +49,15 @@ impl Todo {
         Ok(Self { 
             tasks,
         })
+    }
+
+    pub fn describe(&mut self, name: &str, desc: String) -> Result<(), TodoError> {
+        match self.tasks.iter_mut().find(|task| task.name == name) {
+            Some(task) => task.description = desc,
+            None => return Err(TodoError(format!("{} is not an existing task!", name))) 
+        }
+
+        Ok(())
     }
 
     pub fn add(&mut self, name: String, prio: Option<Colour>) -> Result<(), TodoError> {
