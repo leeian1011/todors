@@ -10,6 +10,7 @@ pub const RESET: &'static str = "\u{001b}[0m";
 
 const LINECOLOURS: Colour = Colour::BlueText;
 
+#[derive(serde::Deserialize, Clone, Copy)]
 pub enum Colour {
     RedText,
     GreenText,
