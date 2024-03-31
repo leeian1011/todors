@@ -4,8 +4,9 @@ use todoer::print::{Colour, Printer};
 
 use crate::todoer::todo;
 
-const TODORSCOLOURS: Colour = Colour::GreenText;
-const HELPLIST: [&'static str; 5] = [
+const TODORS_COLOURS: Colour = Colour::GreenText;
+const TODORS_TABLE_COLOURS: [Colour;2] = [Colour::RedText, Colour::GreenText];
+const HELP_LIST: [&'static str; 5] = [
     "list",
     "add [task]",
     "remove [task]",
@@ -43,8 +44,8 @@ fn main() {
         ]
     };
 
-    Printer::box_print(&["todors"], &TODORSCOLOURS);
-    print!("|> ");
+    Printer::box_print(&["todors"], &TODORS_COLOURS);
+    Printer::cursor();
     let _ = std::io::stdout().flush();
 
     let mut stdin_buffer = String::new();
@@ -77,72 +78,71 @@ fn main() {
             "add" => {
                 match todo.add("task1".to_string(), Some("Ohboi".to_string()), None) {
                     Err(e) => Printer::box_print(&[e.0.as_str()], &Colour::RedText),
-                    Ok(_) => Printer::box_print(&[format!("Successfully added {}!", "task1").as_str()], &TODORSCOLOURS),
+                    Ok(_) => Printer::box_print(&[format!("Successfully added {}!", "task1").as_str()], &TODORS_COLOURS),
                 };
             }
             "help" => {
                 if split_buffer.len() == 1 {
                     Printer::println_colour(
                         "todors: You may run the following commands",
-                        &TODORSCOLOURS,
+                        &TODORS_COLOURS,
                     );
-                    Printer::box_print(&HELPLIST, &TODORSCOLOURS);
+                    Printer::box_print(&HELP_LIST, &TODORS_COLOURS);
                 } else if split_buffer.len() == 2 {
                     match split_buffer[1].trim() {
                         "list" => {
-                            todo.list();
+                            _ = Printer::table_print(
+                                &listhelp,
+                                &TODORS_TABLE_COLOURS,
+                            );
                         }
                         "add" => {
                             _ = Printer::table_print(
                                 &addhelp,
-                                &[Colour::RedText, Colour::GreenText],
+                                &TODORS_TABLE_COLOURS,
                             );
                         }
                         "remove" => {
                             _ = Printer::table_print(
                                 &removehelp,
-                                &[Colour::RedText, Colour::GreenText],
+                                &TODORS_TABLE_COLOURS,
                             );
                         }
                         "complete" => {
                             _ = Printer::table_print(
                                 &completehelp,
-                                &[Colour::RedText, Colour::GreenText],
+                                &TODORS_TABLE_COLOURS,
                             );
                         }
                         _ => {
                             Printer::println_colour(
                                 "todors: I didn't quite get that",
-                                &TODORSCOLOURS,
+                                &TODORS_COLOURS,
                             );
                             Printer::println_colour(
                                 "todors: You may run the following commands",
-                                &TODORSCOLOURS,
+                                &TODORS_COLOURS,
                             );
-                            Printer::box_print(&HELPLIST, &TODORSCOLOURS);
+                            Printer::box_print(&HELP_LIST, &TODORS_COLOURS);
                         }
                     }
                 } else {
-                    Printer::println_colour("todors: I didn't quite get that", &TODORSCOLOURS);
+                    Printer::println_colour("todors: I didn't quite get that", &TODORS_COLOURS);
                     Printer::println_colour(
                         "todors: You may run the following commands",
-                        &TODORSCOLOURS,
+                        &TODORS_COLOURS,
                     );
-                    Printer::box_print(&HELPLIST, &TODORSCOLOURS);
+                    Printer::box_print(&HELP_LIST, &TODORS_COLOURS);
                 }
             }
             "exit" => {
-                Printer::println_colour("todors: goodbye!", &TODORSCOLOURS);
+                Printer::println_colour("todors: goodbye!", &TODORS_COLOURS);
                 panic!();
             }
-            _ => Printer::println_colour("todors: I didn't quite get that", &TODORSCOLOURS),
+            _ => Printer::println_colour("todors: I didn't quite get that", &TODORS_COLOURS),
         }
         stdin_buffer.clear();
-        print!("|> ");
+        Printer::cursor();
         let _ = std::io::stdout().flush();
     }
-
-    // let date = Local::now().to_rfc3339();
-    //
-    // Printer::println_colour(&date, &[Colour::BlueText]);
 }

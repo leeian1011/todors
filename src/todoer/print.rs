@@ -50,6 +50,10 @@ impl Printer {
         print!("{}", outcome);
     }
 
+    pub fn cursor() {
+        print!("|> ");
+    }
+
     fn gen_line(length: usize) {
         Self::print_colour("+", &LINECOLOURS);
         for _ in 0..length {
