@@ -2,6 +2,8 @@ mod todoer;
 use std::io::{BufRead, Write};
 use todoer::print::{Colour, Printer};
 
+use crate::todoer::todo;
+
 const TODORSCOLOURS: Colour = Colour::GreenText;
 const HELPLIST: [&'static str; 5] = [
     "list",
@@ -12,6 +14,7 @@ const HELPLIST: [&'static str; 5] = [
 ];
 
 fn main() {
+    let mut todo = todo::Todo::new().unwrap();
     let listhelp: [Vec<&'static str>; 2] = {
         [
             vec!["COMMAND", "list"],
@@ -68,7 +71,15 @@ fn main() {
                     ],
                 );
             }
-            "list" => {}
+            "list" => {
+                todo.list();
+            }
+            "add" => {
+                match todo.add("task1".to_string(), Some("Ohboi".to_string()), None) {
+                    Err(e) => Printer::box_print(&[e.0.as_str()], &Colour::RedText),
+                    Ok(_) => Printer::box_print(&[format!("Successfully added {}!", "task1").as_str()], &TODORSCOLOURS),
+                };
+            }
             "help" => {
                 if split_buffer.len() == 1 {
                     Printer::println_colour(
@@ -79,10 +90,7 @@ fn main() {
                 } else if split_buffer.len() == 2 {
                     match split_buffer[1].trim() {
                         "list" => {
-                            _ = Printer::table_print(
-                                &listhelp,
-                                &[Colour::RedText, Colour::GreenText],
-                            );
+                            todo.list();
                         }
                         "add" => {
                             _ = Printer::table_print(
