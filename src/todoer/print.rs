@@ -173,6 +173,7 @@ impl Printer {
 
 #[derive(Debug)]
 pub struct PrinterError {
+    #[allow(dead_code)]
     error: String,
 }
 
