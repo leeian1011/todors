@@ -81,7 +81,28 @@ fn main() {
                 );
             }
             "list" => {
-                todo.lock().unwrap().list();
+                if split_buffer.len() == 1 {
+                    todo.lock().unwrap().list();
+                } else {
+                    let key_value = split_buffer[1].split("=").collect::<Vec<_>>();
+                    let mut value = String::new();
+                    match key_value[0].trim() {
+                        "!t" => {}
+                        "t" => {
+                            value = key_value[1].trim().to_string();
+                        }
+                        _ => {
+                            Printer::box_print(&["`list` command used incorrectly."], &Colour::RedText);
+                            Printer::cursor();
+                            _ = std::io::stdout().flush();
+                            stdin_buffer.clear();
+                            continue 'main;
+                        }
+                    }
+
+                    todo.lock().unwrap().list_tag(&value);
+                }
+
             }
             "add" => {
                 split_buffer.swap_remove(0);

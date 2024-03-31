@@ -79,7 +79,7 @@ impl Todo {
     }
 
     pub fn list(&self) {
-        let mut printable_array: [Vec<&str>;3] = [vec!["Name"], vec!["Tag"], vec!["Description"]];
+        let mut printable_array: [Vec<&str>;4] = [vec!["Name"], vec!["Tag"], vec!["Description"], vec!["Completed"]];
         
         let mut colour_array: Vec<Colour> = vec![Colour::MagentaText];
         let tasks = &self.tasks;
@@ -88,10 +88,42 @@ impl Todo {
             printable_array[0].push(&task.name);
             printable_array[1].push(&task.tag);
             printable_array[2].push(&task.description);
+            printable_array[3].push(
+                match task.completed {
+                    true => "true",
+                    false => "false",
+                }
+            );
             if task.completed {
                 colour_array.push(Colour::GreenText);
             } else {
                 colour_array.push(task.priority);
+            }
+        }
+
+        _ = Printer::table_print(&printable_array, &colour_array);
+    }
+
+    pub fn list_tag(&self, tag: &str) {
+        let mut printable_array: [Vec<&str>; 3] = [vec!["Name"], vec!["Description"], vec!["Completed"]];
+        let mut colour_array: Vec<Colour> = vec![Colour::MagentaText];
+        let tasks = &self.tasks;
+
+        for task in tasks {
+            if task.tag == tag {
+                printable_array[0].push(&task.name);
+                printable_array[1].push(&task.description);
+                printable_array[2].push(
+                    match task.completed {
+                        true => "true",
+                        false => "false",
+                    }
+                    );
+                if task.completed {
+                    colour_array.push(Colour::GreenText);
+                } else {
+                    colour_array.push(task.priority);
+                }
             }
         }
 
