@@ -1,7 +1,14 @@
 mod todoer;
-use std::{io::{BufRead, Write}, process::exit, sync::{Arc, Mutex}};
-use todoer::{print::{Colour, Printer}, todo::Todo};
 use ctrlc::set_handler;
+use std::{
+    io::{BufRead, Write},
+    process::exit,
+    sync::{Arc, Mutex},
+};
+use todoer::{
+    print::{Colour, Printer},
+    todo::Todo,
+};
 
 const TODORS_COLOURS: Colour = Colour::GreenText;
 const TODORS_TABLE_COLOURS: [Colour; 2] = [Colour::RedText, Colour::GreenText];
@@ -21,7 +28,8 @@ fn main() {
         todo_lock.save().unwrap();
         println!();
         exit(-1);
-    }).unwrap();
+    })
+    .unwrap();
 
     let listhelp: [Vec<&'static str>; 2] = {
         [
@@ -62,24 +70,6 @@ fn main() {
         let stdin_buffer_two = stdin_buffer.clone();
         let mut split_buffer = stdin_buffer_two.split(' ').collect::<Vec<_>>();
         match split_buffer.first().expect("split returned len 0").trim() {
-            "debug" => {
-                _ = Printer::table_print(
-                    &[
-                        vec!["Name", "Cybotrade-v1.4.0", "Datasource-v1.7.8"],
-                        vec![
-                        "Description",
-                        "Check if change of function signature will affect anything",
-                        "Check for any changes required for cybotrade to introduce new datasource"],
-                        vec!["Created", "3d ago", "17m ago"],
-                    ],
-                    &[
-                        Colour::MagentaText,
-                        Colour::RedText,
-                        Colour::GreenText,
-                        Colour::CyanText,
-                    ],
-                );
-            }
             "list" => {
                 if split_buffer.len() == 1 {
                     todo.lock().unwrap().list();
@@ -92,7 +82,10 @@ fn main() {
                             value = key_value[1].trim().to_string();
                         }
                         _ => {
-                            Printer::box_print(&["`list` command used incorrectly."], &Colour::RedText);
+                            Printer::box_print(
+                                &["`list` command used incorrectly."],
+                                &Colour::RedText,
+                            );
                             Printer::cursor();
                             _ = std::io::stdout().flush();
                             stdin_buffer.clear();
@@ -102,7 +95,6 @@ fn main() {
 
                     todo.lock().unwrap().list_tag(&value);
                 }
-
             }
             "add" => {
                 split_buffer.swap_remove(0);
@@ -160,13 +152,16 @@ fn main() {
 
                 let name = match name {
                     None => {
-                        Printer::box_print(&["The `name` key input was not given!"], &Colour::RedText);
+                        Printer::box_print(
+                            &["The `name` key input was not given!"],
+                            &Colour::RedText,
+                        );
                         Printer::cursor();
                         _ = std::io::stdout().flush();
                         stdin_buffer.clear();
                         continue 'main;
                     }
-                    Some(name) => name 
+                    Some(name) => name,
                 };
 
                 match todo.lock().unwrap().add(name.clone(), prio, tag) {
@@ -176,18 +171,43 @@ fn main() {
                         &TODORS_COLOURS,
                     ),
                 };
-            },
+            }
             "remove" => {
                 let name = split_buffer[1].trim().to_string();
                 Printer::box_print(
                     &[format!("Successfully removed '{}'", name).as_str()],
-                    &TODORS_COLOURS
+                    &TODORS_COLOURS,
                 );
                 todo.lock().unwrap().remove(name);
             }
+            "complete" => {
+                if split_buffer.len() != 2 {
+                    Printer::box_print(
+                        &["`complete` command was used incorrectly."],
+                        &Colour::RedText,
+                    );
+                    Printer::cursor();
+                    _ = std::io::stdout().flush();
+                    stdin_buffer.clear();
+                    continue 'main;
+                }
+
+                match todo.lock().unwrap().complete(split_buffer[1].trim()) {
+                    Err(e) => {
+                        Printer::box_print(
+                            &[&e.0],
+                            &Colour::RedText,
+                            );
+                    }
+                    Ok(_) => {}
+                };
+            }
             "describe" => {
-                if split_buffer.len() <=2 {
-                    Printer::box_print(&["`describe` command was used incorrectly."], &Colour::RedText);
+                if split_buffer.len() <= 2 {
+                    Printer::box_print(
+                        &["`describe` command was used incorrectly."],
+                        &Colour::RedText,
+                    );
                     Printer::cursor();
                     _ = std::io::stdout().flush();
                     stdin_buffer.clear();
@@ -195,13 +215,13 @@ fn main() {
                 }
 
                 let name = split_buffer[1].trim();
-                let desc = split_buffer[2..split_buffer.len()].join(" ").trim().to_string();
+                let desc = split_buffer[2..split_buffer.len()]
+                    .join(" ")
+                    .trim()
+                    .to_string();
                 _ = todo.lock().unwrap().describe(name, desc);
-
-            },
-            "tag" => {
-
             }
+            "tag" => {}
             "help" => {
                 if split_buffer.len() == 1 {
                     Printer::box_print(&["You may run the following commands"], &TODORS_COLOURS);
@@ -222,7 +242,10 @@ fn main() {
                         }
                         _ => {
                             Printer::box_print(&["Unrecognized command"], &TODORS_COLOURS);
-                            Printer::box_print(&["You may run the following commands"], &TODORS_COLOURS);
+                            Printer::box_print(
+                                &["You may run the following commands"],
+                                &TODORS_COLOURS,
+                            );
                             Printer::box_print(&HELP_LIST, &TODORS_COLOURS);
                         }
                     }
@@ -243,7 +266,6 @@ fn main() {
             _ => Printer::box_print(&["Unrecognized command"], &TODORS_COLOURS),
         }
 
-        
         stdin_buffer.clear();
         Printer::cursor();
         let _ = std::io::stdout().flush();
