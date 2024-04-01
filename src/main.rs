@@ -172,6 +172,99 @@ fn main() {
                     ),
                 };
             }
+            "update" => {
+                if split_buffer.len() <= 2 {
+                    Printer::box_print(
+                        &["`update` command was used incorrectly."],
+                        &Colour::RedText,
+                    );
+                    Printer::cursor();
+                    _ = std::io::stdout().flush();
+                    stdin_buffer.clear();
+                    continue 'main;
+                }
+
+                let mut name = None;
+                let mut tag = None;
+                let mut completed = None;
+                let mut prio = None;
+
+                for item in &split_buffer[2..split_buffer.len()] {
+                    let key_value = item.split("=").collect::<Vec<_>>();
+                    if key_value.len() != 2 {
+                        Printer::box_print(
+                            &["`update` command was used incorrectly."],
+                            &Colour::RedText,
+                        );
+                        Printer::cursor();
+                        _ = std::io::stdout().flush();
+                        stdin_buffer.clear();
+                        continue 'main;
+                    }
+                    match key_value[0] {
+                        "name" | "n" => {
+                            name = Some(key_value[1].trim().to_string());
+                        }
+                        "tag" | "t" => {
+                            tag = Some(key_value[1].trim().to_string());
+                        }
+                        "priority" | "p" => {
+                            match key_value[1].trim() {
+                                "high" => prio = Some(Colour::RedText),
+                                "medium" => prio = Some(Colour::MagentaText),
+                                "low" => prio = Some(Colour::CyanText),
+                                _ => {
+                                    Printer::box_print(
+                                        &[format!("Invalid value for key '{}'", key_value[0]).as_str()],
+                                        &Colour::RedText,
+                                        );
+                                    Printer::cursor();
+                                    _ = std::io::stdout().flush();
+                                    stdin_buffer.clear();
+                                    continue 'main;
+                                }
+                            }
+                        }
+                        "completed" | "c" => match key_value[1].trim() {
+                            "t" | "true" => completed = Some(true),
+                            "f" | "false" => completed = Some(false),
+                            _ => {
+                                Printer::box_print(
+                                    &["`update` command was used incorrectly."],
+                                    &Colour::RedText,
+                                );
+                                Printer::cursor();
+                                _ = std::io::stdout().flush();
+                                stdin_buffer.clear();
+                                continue 'main;
+                            }
+                        },
+                        _ => {
+                            Printer::box_print(
+                                &[format!("Invalid key input '{}'", key_value[0]).as_str()],
+                                &Colour::RedText,
+                            );
+                            Printer::cursor();
+                            _ = std::io::stdout().flush();
+                            stdin_buffer.clear();
+                            continue 'main;
+                        }
+                    }
+                }
+
+                let target = split_buffer[1];
+
+                match todo.lock().unwrap().update(target, name, tag, prio, completed) {
+                    Err(e) => {
+                        Printer::box_print(&[&e.0], &Colour::RedText);
+                        Printer::cursor();
+                        _ = std::io::stdout().flush();
+                        stdin_buffer.clear();
+                        continue 'main;
+                    }
+                    Ok(_) => {}
+                }
+            }
             "remove" => {
                 let name = split_buffer[1].trim().to_string();
                 Printer::box_print(
@@ -194,10 +287,7 @@ fn main() {
 
                 match todo.lock().unwrap().complete(split_buffer[1].trim()) {
                     Err(e) => {
-                        Printer::box_print(
-                            &[&e.0],
-                            &Colour::RedText,
-                            );
+                        Printer::box_print(&[&e.0], &Colour::RedText);
                     }
                     Ok(_) => {}
                 };
