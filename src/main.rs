@@ -126,7 +126,7 @@ fn main() {
                         "priority" | "p" => {
                             prio = match key_value[1].trim().to_lowercase().as_str() {
                                 "high" => Some(Colour::RedText),
-                                "medium" => Some(Colour::MagentaText),
+                                "medium" => Some(Colour::YellowText),
                                 "low" => Some(Colour::CyanText),
                                 _ => {
                                     Printer::box_print(&["Provided `priority` value was not recognized. Defaulting to 'low'"], &TODORS_COLOURS);
@@ -211,7 +211,7 @@ fn main() {
                         "priority" | "p" => {
                             match key_value[1].trim() {
                                 "high" => prio = Some(Colour::RedText),
-                                "medium" => prio = Some(Colour::MagentaText),
+                                "medium" => prio = Some(Colour::YellowText),
                                 "low" => prio = Some(Colour::CyanText),
                                 _ => {
                                     Printer::box_print(

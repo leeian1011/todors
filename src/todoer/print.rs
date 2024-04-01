@@ -1,5 +1,6 @@
 pub const RED_TEXT: &'static str = "\u{001b}[31m";
 pub const GREEN_TEXT: &'static str = "\u{001b}[32m";
+pub const YELLOW_TEXT: &'static str = "\u{001b}[33m";
 pub const BLUE_TEXT: &'static str = "\u{001b}[34m";
 pub const MAGENTA_TEXT: &'static str = "\u{001b}[35m";
 pub const CYAN_TEXT: &'static str = "\u{001b}[36m";
@@ -14,6 +15,7 @@ const LINECOLOURS: Colour = Colour::BlueText;
 pub enum Colour {
     RedText,
     GreenText,
+    YellowText,
     BlueText,
     MagentaText,
     CyanText,
@@ -23,6 +25,7 @@ fn get_colour_code(colour: &Colour) -> &'static str {
     match colour {
         Colour::RedText => RED_TEXT,
         Colour::GreenText => GREEN_TEXT,
+        Colour::YellowText => YELLOW_TEXT,
         Colour::BlueText => BLUE_TEXT,
         Colour::MagentaText => MAGENTA_TEXT,
         Colour::CyanText => CYAN_TEXT,
