@@ -265,6 +265,9 @@ fn main() {
                     Ok(_) => {}
                 }
             }
+            "clear" => {
+                println!("\u{001b}[2J");
+            }
             "remove" => {
                 let name = split_buffer[1].trim().to_string();
                 Printer::box_print(
