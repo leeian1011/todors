@@ -78,6 +78,15 @@ impl Todo {
         self.tasks.retain(|task| task.name != name);
     }
 
+    pub fn complete(&mut self, name: &str) -> Result<(), TodoError> {
+        match self.tasks.iter_mut().find(|task| task.name == name) {
+            Some(task) => task.completed = true,
+            None => return Err(TodoError(format!("Task with name {} does not exist!", name))),
+        }
+
+        Ok(())
+    }
+
     pub fn list(&self) {
         let mut printable_array: [Vec<&str>;4] = [vec!["Name"], vec!["Tag"], vec!["Description"], vec!["Completed"]];
         
